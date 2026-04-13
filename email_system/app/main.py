@@ -23,11 +23,12 @@ async def upload_csv(file: UploadFile = File(...)):
 # bounce endpoint (add in main.py)
 from app.services.suppression import add_block
 from fastapi import Request
+from pydantic import BaseModel
+
+class BounceSchema(BaseModel):
+    email: str
 
 @app.post("/webhook/bounce")
-async def bounce(req: Request):
-    data = await req.json()
-    email = data.get("email")
-
-    add_block(email)
-    return {"status": "blocked"}
+async def bounce(data: BounceSchema):
+    add_block(data.email)
+    return {"status": "blocked", "email": data.email}
